@@ -117,14 +117,14 @@ char readparse_buttons()
 {
 	int data;
 	int timetowait = 0;
-	char key = 0, oldkey = -1, holdkey = 1;
+	char key = 0;
 	bool keypressed = false;
+	static char oldkey = -1;
 
 	while (keypressed == false || oldkey != key) {
-		if (holdkey && mytimeout && key == oldkey)
+		if (mytimeout && key == oldkey)
 			break;
-		if (holdkey)
-			oldkey = key;
+
 		if (mytimeout >= 0) {
 			timetowait = (mytimeout * 1000);
 			usleep(timetowait);
@@ -137,11 +137,11 @@ char readparse_buttons()
 				if (bright > 255)
 					bright = 255;
 				GO.lcd.setBrightness(bright);
-				holdkey = 0;
 				usleep(500000);
 				continue;
 			}
 			key = 'u';
+			oldkey = 'u';
 			continue;
 		}
 		if (data == DPAD_V_HALF) {
@@ -150,61 +150,69 @@ char readparse_buttons()
 				if (bright < 0)
 					bright = 0;
 				GO.lcd.setBrightness(bright);
-				holdkey = 0;
 				usleep(500000);
 				continue;
 			}
 			key = 'd';
+			oldkey = 'd';
 			continue;
 		}
 		data = GO.JOY_X.isAxisPressed();
 		if (data == DPAD_V_FULL) {
 			key = 'l';
+			oldkey = 'l';
 			continue;
 		}
 		if (data == DPAD_V_HALF) {
 			key = 'r';
+			oldkey = 'r';
 			continue;
 		}
 
 		data = GO.BtnA.isPressed();
 		if (data) {
 			key = 'a';
+			oldkey = 'a';
 			continue;
 		}
 
 		data = GO.BtnB.isPressed();
 		if (data) {
 			key = 'b';
+			oldkey = 'b';
 			continue;
 		}
 
 		data = GO.BtnSelect.isPressed();
 		if (data) {
 			key = 's';
+			oldkey = 's';
 			continue;
 		}
 
 		data = GO.BtnVolume.isPressed();
 		if (data) {
 			key = 'v';
+			oldkey = 'v';
 			continue;
 		}
 
 		data = GO.BtnMenu.isPressed();
 		if (data) {
 			key = 'm';
+			oldkey = 'm';
 			continue;
 		}
 
 		data = GO.BtnStart.isPressed();
 		if (data) {
 			key = 't';
-			usleep(500000);
+			oldkey = 't';
 			continue;
 		}
 
-		holdkey = 1;
+		key = -1;
+		oldkey = -1;
 
 		if (mytimeout < 0 && key && !keypressed && !GO.JOY_X.isAxisPressed() &&
 		    !GO.BtnA.isPressed() && !GO.BtnB.isPressed() &&
